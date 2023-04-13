@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 app = Flask(__name__)
@@ -25,8 +26,22 @@ def home():
     return render_template("index.html")
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        try:
+            new_user = User(
+                email = request.form["email"],
+                password = request.form["password"],
+                name = request.form["name"]
+            )
+            db.session.add(new_user)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return "Sorry use a different email"
+        return redirect(url_for("secrets", user=request.form["name"]))
+
     return render_template("register.html")
 
 
@@ -35,9 +50,9 @@ def login():
     return render_template("login.html")
 
 
-@app.route('/secrets')
-def secrets():
-    return render_template("secrets.html")
+@app.route('/secrets/<user>')
+def secrets(user):
+    return render_template("secrets.html", user=user)
 
 
 @app.route('/logout')
