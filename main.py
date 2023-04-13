@@ -60,9 +60,10 @@ def logout():
     pass
 
 
-@app.route('/download')
-def download():
-    pass
+@app.route('/download/<path:filename>')
+def download(filename):
+    app.config['UPLOAD_FOLDER'] = "./static/files"
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 if __name__ == "__main__":
