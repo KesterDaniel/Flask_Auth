@@ -2,8 +2,24 @@
 {% block content %}
 
 <div class="box">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-warning">
+                {{ message }}
+            </div>
+            {% endfor %}
+            <script>
+                setTimeout(function() {
+                  var flashes = document.querySelector('.alert');
+                  if (flashes) {
+                    flashes.remove();
+                  }
+                }, 5000); // Remove the message after 5 seconds (5000 milliseconds)
+            </script>
+        {% endif %}
+    {% endwith %}
     <h1>Login</h1>
-
     <form action="{{ url_for('login') }}" method="post">
         <input type="text" name="email" placeholder="Email" required="required"/>
         <input type="password" name="password" placeholder="Password" required="required"/>

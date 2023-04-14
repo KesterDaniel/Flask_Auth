@@ -63,8 +63,8 @@ def register():
             db.session.add(new_user)
             db.session.commit()
         except IntegrityError:
-            db.session.rollback()
-            return "Sorry use a different email"
+            flash("Email already in use. Login instead?")
+            return redirect(url_for(request.endpoint))
         login_user(new_user)
         return redirect(url_for("secrets"))
 
@@ -79,7 +79,8 @@ def login():
             login_user(user)
             return redirect(url_for("secrets"))
         else:
-            return "User not Found"
+            flash("Unable to login. Invalid credentials!")
+            return redirect(url_for(request.endpoint))
     return render_template("login.html")
 
 
